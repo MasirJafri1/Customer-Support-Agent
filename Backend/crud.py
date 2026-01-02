@@ -28,3 +28,12 @@ def update_complaint_result(
     complaint.escalation_required = escalated
     complaint.status = "escalated" if escalated else "resolved"
     db.commit()
+
+def update_complaint_status(
+    db,
+    complaint_id: str,
+    status: str
+):
+    complaint = db.query(Complaint).get(complaint_id)
+    complaint.status = status
+    db.commit()

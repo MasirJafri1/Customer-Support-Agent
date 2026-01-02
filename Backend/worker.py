@@ -1,11 +1,10 @@
 from Backend.db import SessionLocal
-from Backend.crud import get_new_complaints,update_complaint_result
+from Backend.crud import get_new_complaints,update_complaint_result,update_complaint_status
 
-# 🔁 Import your PHASE 3 agent
 from Agent.graph import build_graph
+from FinalisingAgent.resolution import decide_resolution
 
 app = build_graph()
-
 
 def process_complaints():
     db = SessionLocal()
@@ -20,11 +19,27 @@ def process_complaints():
             "complaint_text": c.complaint_text
         })
 
+        priority = result.get("reevaluated_priority")
+        escalated = result.get("escalation_required")
+
+        decision = decide_resolution(
+            complaint=c.complaint_text,
+            priority=priority,
+            escalated=escalated
+        )
+
+        if decision.auto_resolve:
+            update_complaint_status(db, c.id, "resolved")
+            print(f"✅ Auto-resolved: {decision.reason}")
+        else:
+            update_complaint_status(db, c.id, "escalated")
+            print(f"🚨 Escalated: {decision.reason}")
+
         update_complaint_result(
             db,
             complaint_id=c.id,
-            priority=result.get("reevaluated_priority"),
-            escalated=result.get("escalation_required", False)
+            priority=priority,
+            escalated=not decision.auto_resolve
         )
 
     db.close()
