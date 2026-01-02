@@ -13,6 +13,10 @@ Complaint:
 
 Category: {category}
 Sentiment: {sentiment}
+                                          
+Example:
+{{"priority": "high", "reason": "Payment issue with angry sentiment"}}
+
 
 Rules:
 - Angry + payment or delivery = high

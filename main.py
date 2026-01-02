@@ -4,7 +4,7 @@ if __name__ == "__main__":
     app = build_graph()
 
     complaint = {
-        "complaint_text": "The quality of the product can be done more better."
+        "complaint_text": "Material quality below average n you just fooling people by showing big discount which is pure cheat"
     }
 
     result = app.invoke(complaint)

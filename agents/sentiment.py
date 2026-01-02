@@ -11,18 +11,26 @@ You are a sentiment analysis agent.
 Complaint:
 {complaint}
 
-Classify sentiment as:
+Classify sentiment as EXACTLY one of:
 - angry
 - neutral
 - chill
 
-Return ONLY valid JSON.
+Return valid JSON with EXACTLY this field:
+- sentiment
+
+Example:
+{{"sentiment": "angry"}}
+
+Rules:
+- No markdown
+- No extra fields
 """)
 
 def analyze_sentiment(complaint: str) -> SentimentOutput:
     response = llm.invoke(
         prompt.format_messages(complaint=complaint)
     )
+
     clean_json = extract_json(response.content)
     return SentimentOutput.model_validate_json(clean_json)
-
