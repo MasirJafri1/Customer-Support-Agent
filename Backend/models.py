@@ -17,5 +17,7 @@ class Complaint(Base):
     priority = Column(String, nullable=True)
     escalation_required = Column(Boolean, default=False)
 
+    email_sent = Column(Boolean, default=False)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

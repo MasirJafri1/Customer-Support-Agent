@@ -37,3 +37,8 @@ def update_complaint_status(
     complaint = db.query(Complaint).get(complaint_id)
     complaint.status = status
     db.commit()
+
+def mark_email_sent(db, complaint_id: str):
+    complaint = db.query(Complaint).get(complaint_id)
+    complaint.email_sent = True
+    db.commit()
