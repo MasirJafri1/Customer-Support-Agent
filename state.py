@@ -2,6 +2,7 @@ from typing import TypedDict, Optional, List
 
 class ComplaintState(TypedDict):
     complaint_text: str
+
     category: Optional[str]
     sentiment: Optional[str]
     priority: Optional[str]
@@ -9,3 +10,7 @@ class ComplaintState(TypedDict):
 
     response_email: Optional[str]
     suggestions: Optional[List[str]]
+
+    reevaluated_priority: Optional[str]
+    escalation_required: Optional[bool]
+    escalation_reason: Optional[str]
