@@ -18,10 +18,12 @@ def process_complaints():
         print(f"\nProcessing complaint {c.id}")
 
         # Run agent
-        result = app.invoke({
-            "complaint_text": c.complaint_text
-        })
-
+        try:
+            result = app.invoke({"complaint_text": c.complaint_text})
+        except Exception as e:
+            print(f"❌ Agent failed for complaint {c.id}: {e}")
+            continue
+        
         priority = result.get("reevaluated_priority")
         escalated = result.get("escalation_required")
         email_body = result.get("response_email")

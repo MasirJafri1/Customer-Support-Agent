@@ -14,17 +14,22 @@ Complaint:
 Final Priority: {priority}
 Re-evaluation Reason: {reason}
 
-Rules:
-- High priority + unresolved risk → escalate
-- Legal, fraud, repeated failures → escalate
-- Otherwise → no escalation
+STRICT RULES:
+- You MUST return valid JSON
+- You MUST return BOTH fields even if escalation is obvious
+- Allowed values:
+  - escalate: true or false
+  - reason: short explanation
 
-Return valid JSON with:
-- escalate (true/false)
-- reason
+DO NOT explain outside JSON.
+DO NOT return empty output.
+
+If priority is "high", escalate = true.
+
+Return ONLY JSON.
 
 Example:
-{{"escalate": true, "reason": "Payment issue unresolved"}}
+{{"escalate": true, "reason": "High-risk unresolved complaint"}}
 """)
 
 def decide_escalation(complaint, priority, reason):
