@@ -3,6 +3,9 @@ from typing import TypedDict, Optional, List
 class ComplaintState(TypedDict):
     complaint_text: str
 
+    is_valid: Optional[bool]
+    validation_reason: Optional[str]
+
     category: Optional[str]
     sentiment: Optional[str]
     priority: Optional[str]

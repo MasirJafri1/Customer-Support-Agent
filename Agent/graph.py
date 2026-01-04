@@ -8,9 +8,15 @@ from .agents.response import generate_email_response
 from .agents.suggestion import suggest_actions
 from .agents.reevaluate import reevaluate_priority
 from .agents.escalation import decide_escalation
+from .agents.validation import validate_complaint
 
 from .utils.memory_store import store_high_priority
 
+def validation_node(state):
+    result = validate_complaint(state["complaint_text"])
+    state["is_valid"] = result.is_valid
+    state["validation_reason"] = result.reason
+    return state
 
 def categorize_node(state):
     state["category"] = categorize(state["complaint_text"]).category
@@ -85,6 +91,11 @@ def route_after_escalation(state):
         return "human"
     return END
 
+def route_after_validation(state):
+    if not state["is_valid"]:
+        return END
+    return "categorize"
+
 
 def human_node(state):
     print("\n🚨 HUMAN ESCALATION REQUIRED 🚨\n")
@@ -95,6 +106,7 @@ def human_node(state):
 def build_graph():
     graph = StateGraph(ComplaintState)
 
+    graph.add_node("validate", validation_node)
     graph.add_node("categorize", categorize_node)
     graph.add_node("sentiment", sentiment_node)
     graph.add_node("priority", priority_node)
@@ -104,7 +116,7 @@ def build_graph():
     graph.add_node("escalation", escalation_node)
     graph.add_node("human", human_node)
 
-    graph.set_entry_point("categorize")
+    graph.set_entry_point("validate")
     graph.add_edge("categorize", "sentiment")
     graph.add_edge("sentiment", "priority")
     graph.add_edge("priority", "response")
@@ -112,5 +124,7 @@ def build_graph():
     graph.add_edge("suggestion", "reevaluate")
     graph.add_edge("reevaluate", "escalation")
     graph.add_conditional_edges("escalation", route_after_escalation)
+    graph.add_conditional_edges("validate", route_after_validation)
+
 
     return graph.compile()

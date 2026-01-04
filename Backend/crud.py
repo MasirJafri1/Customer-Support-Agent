@@ -157,3 +157,11 @@ def get_daily_trend(db):
         {"date": str(date), "count": count}
         for date, count in rows
     ]
+
+def mark_complaint_as_spam(db, complaint_id: str, reason: str):
+    complaint = db.query(Complaint).filter(Complaint.id == complaint_id).first()
+    if complaint:
+        complaint.status = "spam"
+        complaint.priority = "none"
+        complaint.escalation_required = False
+        db.commit()

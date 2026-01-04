@@ -1,5 +1,5 @@
 from Backend.db import SessionLocal
-from Backend.crud import (get_new_complaints,update_complaint_result,update_complaint_status,mark_email_sent)
+from Backend.crud import (get_new_complaints, mark_complaint_as_spam,update_complaint_result,update_complaint_status,mark_email_sent)
 
 from Agent.graph import build_graph
 from FinalisingAgent.resolution import decide_resolution
@@ -20,6 +20,13 @@ def process_complaints():
         # Run agent
         try:
             result = app.invoke({"complaint_text": c.complaint_text})
+
+            if result.get("is_valid") is False:
+                print(f"🛑 Spam detected: {result['validation_reason']}")
+                mark_complaint_as_spam(db, c.id, result["validation_reason"])
+                continue
+
+
         except Exception as e:
             print(f"❌ Agent failed for complaint {c.id}: {e}")
             continue
