@@ -4,8 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .db import SessionLocal, engine
 from .models import Base
-from .crud import create_complaint,get_all_complaints,get_complaint_by_id,get_complaints_by_email,update_complaint,delete_complaint
-from .schemas import ComplaintResponse,ComplaintUpdate
+from .crud import create_complaint,get_all_complaints,get_complaint_by_id,get_complaints_by_email,update_complaint,delete_complaint,get_metrics_summary,get_status_breakdown,get_priority_breakdown,get_daily_trend
+from .schemas import ComplaintResponse,ComplaintUpdate,MetricsSummary,StatusBreakdown,PriorityBreakdown,DailyTrend
 from typing import List, Optional
 
 Base.metadata.create_all(bind=engine)
@@ -110,3 +110,34 @@ def get_complaints_for_customer(email: str):
     complaints = get_complaints_by_email(db, email)
     db.close()
     return complaints
+
+@app.get("/analytics/summary", response_model=MetricsSummary)
+def analytics_summary():
+    db = SessionLocal()
+    data = get_metrics_summary(db)
+    db.close()
+    return data
+
+
+@app.get("/analytics/status", response_model=StatusBreakdown)
+def analytics_by_status():
+    db = SessionLocal()
+    data = get_status_breakdown(db)
+    db.close()
+    return {"by_status": data}
+
+
+@app.get("/analytics/priority", response_model=PriorityBreakdown)
+def analytics_by_priority():
+    db = SessionLocal()
+    data = get_priority_breakdown(db)
+    db.close()
+    return {"by_priority": data}
+
+
+@app.get("/analytics/trends", response_model=List[DailyTrend])
+def analytics_trends():
+    db = SessionLocal()
+    data = get_daily_trend(db)
+    db.close()
+    return data

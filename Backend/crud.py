@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from .models import Complaint
+from sqlalchemy import func
 
 def create_complaint(db: Session, email: str, order_id: str, text: str):
     complaint = Complaint(
@@ -97,3 +98,62 @@ def delete_complaint(db: Session, complaint_id: str):
     db.delete(complaint)
     db.commit()
     return True
+
+def get_metrics_summary(db):
+    total = db.query(func.count(Complaint.id)).scalar()
+    resolved = (
+        db.query(func.count(Complaint.id))
+        .filter(Complaint.status == "resolved")
+        .scalar()
+    )
+    escalated = (
+        db.query(func.count(Complaint.id))
+        .filter(Complaint.status == "escalated")
+        .scalar()
+    )
+
+    resolution_rate = (resolved / total * 100) if total else 0
+    escalation_rate = (escalated / total * 100) if total else 0
+
+    return {
+        "total_complaints": total,
+        "resolved": resolved,
+        "escalated": escalated,
+        "resolution_rate": round(resolution_rate, 2),
+        "escalation_rate": round(escalation_rate, 2),
+    }
+
+
+def get_status_breakdown(db):
+    rows = (
+        db.query(Complaint.status, func.count(Complaint.id))
+        .group_by(Complaint.status)
+        .all()
+    )
+    return {status: count for status, count in rows}
+
+
+def get_priority_breakdown(db):
+    rows = (
+        db.query(Complaint.priority, func.count(Complaint.id))
+        .group_by(Complaint.priority)
+        .all()
+    )
+    return {priority or "unassigned": count for priority, count in rows}
+
+
+def get_daily_trend(db):
+    rows = (
+        db.query(
+            func.date(Complaint.created_at),
+            func.count(Complaint.id)
+        )
+        .group_by(func.date(Complaint.created_at))
+        .order_by(func.date(Complaint.created_at))
+        .all()
+    )
+
+    return [
+        {"date": str(date), "count": count}
+        for date, count in rows
+    ]
