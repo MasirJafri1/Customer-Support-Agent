@@ -1,18 +1,20 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  CheckCircle, 
-  Clock, 
+import {
+  LayoutDashboard,
+  CheckCircle,
+  Clock,
   Settings,
   LogOut,
-  User
+  User,
+  BarChart2
 } from 'lucide-react';
 
 const Sidebar = () => {
   const navItems = [
     { path: '/pending', label: 'Pending Complaints', icon: Clock },
     { path: '/resolved', label: 'Resolved Complaints', icon: CheckCircle },
+    { path: '/analytics', label: 'Analytics', icon: BarChart2 },
   ];
 
   return (
@@ -31,10 +33,9 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive
-                  ? 'bg-blue-50 text-blue-700 shadow-sm font-medium'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                ? 'bg-blue-50 text-blue-700 shadow-sm font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`
             }
           >
@@ -44,7 +45,7 @@ const Sidebar = () => {
         ))}
 
         <div className="mt-8 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">Settings</div>
-        
+
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200">
           <User className="w-5 h-5" />
           <span>Profile</span>
