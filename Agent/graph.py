@@ -4,7 +4,7 @@ from .state import ComplaintState
 from .agents.categorizer import categorize
 from .agents.sentiment import analyze_sentiment
 from .agents.priority import assign_priority
-from .agents.response import draft_response
+from .agents.response import generate_email_response
 from .agents.suggestion import suggest_actions
 from .agents.reevaluate import reevaluate_priority
 from .agents.escalation import decide_escalation
@@ -34,15 +34,12 @@ def priority_node(state):
 
 
 def response_node(state):
-    result = draft_response(
-        state["complaint_text"],
-        state["category"],
-        state["sentiment"],
-        state["priority"]
+    state["response_email"] = generate_email_response(
+        complaint_text=state["complaint_text"],
+        category=state["category"],
+        priority=state["priority"]
     )
-    state["response_email"] = result.body
     return state
-
 
 def suggestion_node(state):
     result = suggest_actions(
@@ -75,7 +72,10 @@ def escalation_node(state):
     state["escalation_required"] = result.escalate
 
     if result.escalate:
-        store_high_priority(state)
+        try:
+            store_high_priority(state)
+        except Exception:
+            pass  
 
     return state
 
